@@ -1,0 +1,81 @@
+{
+  "name": "extension-rpc",
+  "displayName": "Dly's Extension RPC",
+  "description": "Custom Personal Discord Rich Presence for Visual Studio Code",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.134.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Extension RPC",
+      "properties": {
+        "extensionRpc.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable Discord Rich Presence."
+        },
+        "extensionRpc.detailsFormat": {
+          "type": "string",
+          "default": "Working on {project}",
+          "description": "Primary Rich Presence text. Variables: {project}, {file}, {language}, and {icon}."
+        },
+        "extensionRpc.stateFormat": {
+          "type": "string",
+          "default": "Editing {file}",
+          "description": "Secondary Rich Presence text. Variables: {project}, {file}, {language}, and {icon}."
+        },
+        "extensionRpc.largeImageTextFormat": {
+          "type": "string",
+          "default": "{project} • {language}",
+          "description": "Text displayed when hovering over the large image."
+        },
+        "extensionRpc.showElapsedTime": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show how long the current VS Code session has been running."
+        },
+        "extensionRpc.iconOverride": {
+          "type": "integer",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 8,
+          "description": "Force an icon from 1 to 8. Use 0 for automatic project-based selection."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "24.x",
+    "@types/vscode": "^1.134.0",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.0.0",
+    "@vscode/vsce": "^3.9.2",
+    "eslint": "^10.5.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1"
+  },
+  "overrides": {
+    "diff": "^8.0.4",
+    "serialize-javascript": "^7.0.6"
+  },
+  "dependencies": {
+    "@xhayper/discord-rpc": "^1.3.4"
+  }
+}
