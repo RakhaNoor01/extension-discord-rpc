@@ -41,8 +41,6 @@ Every workspace is mapped to one of 23 Confidant-themed of Persona 5 Royal Socia
     <img
       src="images/preview.png?raw=true&v=2"
       alt="Dly's Extension RPC displaying a coding activity on Discord"
-      width="412"
-      height="176"
     >
   </a>
 </div>
