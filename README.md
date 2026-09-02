@@ -1,76 +1,48 @@
 <div align="center">
 
-Dly's Extension RPC
+<img src="images/icon.png" alt="Dly's Extension RPC icon" width="128" height="128">
 
-A Confidant-themed Discord Rich Presence for Visual Studio Code
+# Dly's Extension RPC
+
+A Confidant-themed Discord Rich Presence extension for Visual Studio Code.
+
+</div>
+
+---
+
+## About
+
+Dly's Extension RPC publishes your current Visual Studio Code activity to Discord. The presence can display the active project, file, programming language, elapsed session time, and a project-specific image.
+
+Projects are assigned one of 23 Rich Presence images through deterministic mapping. The extension uses the project's Git remote as its identity when available and falls back to the workspace URI for local projects. This ensures that the same project retains the same image between sessions.
+
 
 Show what you are working on through a customizable Discord activity, complete with project-aware Confidant-inspired artwork.
-
 </div>
+
 
 About
+- Visual Studio Code `1.134.0` or newer
+- Discord Desktop running on the same computer
+- **Display current activity as a status message** enabled in Discord's Activity Privacy settings
 
-Dly's Extension RPC is a customizable Discord Rich Presence extension for Visual Studio Code. It displays the current workspace, active file, programming language, elapsed session time, and a stable project-specific image on your Discord profile.
 
-Each project is assigned one of 23 Rich Presence images using a deterministic project identity. Opening the same project again keeps the same image instead of choosing one randomly.
-
-This is an unofficial, fan-made project inspired by the visual style of the Persona series.
-
-Preview
-
-<div align="center">
-  <img src="images/preview.png" alt="Discord Rich Presence preview" width="520">
-</div>
-
-Add your Rich Presence screenshot as images/preview.png to display it above.
-
-Features
-
-Confidant-themed Discord Rich Presence
-
-23 custom project images (rpc_1 through rpc_23)
-
-Stable automatic image assignment for every project
-
-Git remote-based project identification
-
-Workspace path fallback for local projects
-
-Per-workspace image override
-
-Active workspace, file, and language detection
-
-Customizable activity text using template variables
-
-Optional elapsed session timer
-
-Playing, Listening, Watching, and Competing activity types
-
-Automatic reconnection when Discord restarts
-
-Multi-root workspace support
-
-Status bar indicator and control menu
-
-Requirements
-
-Visual Studio Code
-
-Discord Desktop running on the same computer
-
-Activity sharing enabled in Discord
-
-Discord in a web browser cannot receive local Rich Presence connections.
-
+Discord's web client cannot receive local Rich Presence connections.
 Installation
 
 Install from a VSIX package
 
+
 Download the latest .vsix file from the repository releases.
+The text settings support the following variables:
 
-Open Visual Studio Code.
+| Variable | Description |
+| --- | --- |
+| `{project}` | Name of the active workspace folder |
+| `{file}` | Name of the active file |
+| `{language}` | Visual Studio Code language identifier |
+| `{icon}` | Selected Discord asset key |
 
-Open the Command Palette with Ctrl+Shift+P.
 
 Run Extensions: Install from VSIX....
 
@@ -134,170 +106,73 @@ true
 Enables or disables Discord Rich Presence.
 
 extensionRpc.detailsFormat
-
-Working on {project}
-
-Controls the primary presence text.
-
-extensionRpc.stateFormat
-
-Editing {file}
-
-Controls the secondary presence text.
-
-extensionRpc.largeImageTextFormat
-
-{project} • {language}
-
-Controls the large-image tooltip.
-
-extensionRpc.showElapsedTime
-
-true
-
-Shows or hides the current session timer.
-
-extensionRpc.iconOverride
-
-0
-
-Selects image 1–23; 0 uses automatic mapping.
-
-extensionRpc.activityType
-
-playing
-
-Selects Playing, Listening, Watching, or Competing.
-
-Workspace-specific settings are stored in the current workspace when a project is open. This makes it possible for different projects to use different image overrides.
-
-Template Variables
-
-The text settings support the following variables:
-
-Variable
-
-Value
-
-{project}
-
-Current workspace name
-
-{file}
-
-Active file name
-
-{language}
-
-Active Visual Studio Code language ID
-
-{icon}
-
-Selected Rich Presence asset key
-
-Example configuration:
+```json
 
 {
   "extensionRpc.detailsFormat": "Working on {project}",
   "extensionRpc.stateFormat": "Editing {file} • {language}",
   "extensionRpc.largeImageTextFormat": "{project} • {icon}"
 }
+```
 
-Activity Types
+Resolved fields are trimmed and limited to 128 characters. Fields shorter than two characters are omitted from the presence.
 
-The activity type can be changed from the extension settings.
+## Project Image Assignment
 
-Setting value
+Automatic image selection follows these steps:
 
-Discord display
+1. The extension determines the active workspace folder.
+2. The normalized Git remote URL is used as the project identity when available.
+3. The normalized workspace URI is used when no Git remote is configured.
+4. The identity is hashed and mapped to an asset from `rpc_1` through `rpc_23`.
 
-playing
+The mapping remains stable while the project identity and number of available assets remain unchanged.
 
-Playing
+To select an image manually, run **Extension RPC: Select Project Icon** and choose an asset. Select **Automatic** to restore project-based mapping.
 
-listening
+## Building
 
-Listening to
+Install dependencies, compile the extension, and create a VSIX package:
 
-watching
-
-Watching
-
-competing
-
-Competing in
-
-Playing is used by default.
-
-Project Image Mapping
-
-Automatic mapping is deterministic rather than random:
-
-The extension checks the active workspace.
-
-If the workspace has a Git remote, the normalized remote URL becomes its identity.
-
-Otherwise, the normalized workspace URI is used.
-
-The identity is hashed and mapped to one of the 23 Discord assets.
-
-As long as the project identity and the number of available assets remain unchanged, the same project receives the same image whenever it is opened.
-
-To override the automatic selection for one workspace, run Extension RPC: Select Project Icon and choose rpc_1 through rpc_23.
-
-Building a VSIX
-
-Compile and package the extension with:
-
+```sh
+npm install
 npm run compile
 npx vsce package
+```
 
-The generated .vsix file can then be installed manually or attached to a GitHub release.
+The generated `.vsix` file can be installed manually or attached to a repository release.
 
-Troubleshooting
+## Troubleshooting
 
-Rich Presence does not appear
+### Rich Presence is not visible
 
-Make sure Discord Desktop is running.
+- Confirm that Discord Desktop is running.
+- Confirm that activity sharing is enabled in Discord.
+- Run **Extension RPC: Reconnect to Discord**.
+- Reload Visual Studio Code and restart Discord if necessary.
 
-Enable activity sharing in Discord settings.
+### Discord displays an outdated image
 
-Run Extension RPC: Reconnect to Discord.
+Discord may cache Rich Presence assets. Restart Discord after replacing an asset in the Developer Portal. Keep the asset keys named `rpc_1` through `rpc_23`.
 
-Restart Discord and reload the Visual Studio Code window.
+### The RPC connection is unavailable
 
-Make sure another application is not interfering with Discord RPC.
+The extension retries the connection automatically with a delay of up to 30 seconds. You can also reconnect manually from the control menu.
 
-The project image looks outdated
+## Privacy
 
-Discord may temporarily cache Rich Presence assets. Restart Discord after replacing assets in the Developer Portal. Asset keys should remain named rpc_1 through rpc_23.
+The extension uses Discord's local RPC connection to publish workspace information to the Discord Desktop client. It reads the active workspace name, file name, language identifier, and Git remote when constructing the activity.
 
-The extension is connected but shows no project
+## Credits and Disclaimer
 
-Open a folder or workspace in Visual Studio Code. When no workspace is open, the extension uses a fallback presence.
+This is an unofficial, fan-made project. It is not affiliated with, endorsed by, sponsored by, or officially connected to ATLUS, P-Studio, or SEGA.
 
-Privacy
+Persona and its related names, characters, artwork, trademarks, and visual materials belong to their respective owners. No ownership is claimed over Persona-related material.
 
-The Rich Presence connection is made locally between Visual Studio Code and Discord Desktop. The extension reads editor and workspace information only to construct the activity shown on Discord.
+Attribution does not grant permission to redistribute copyrighted assets. Persona-related and other third-party visual assets are not covered by any license applied to the original source code.
 
-Credits and Disclaimer
+## License
 
-This is an unofficial, fan-made project created for personal and educational purposes.
+No source-code license has been provided for this repository. Unless a license is added, all rights to the original source code remain reserved by default.
 
-Persona and all related characters, names, artwork, trademarks, and visual assets belong to their respective owners, including ATLUS, P-Studio, and SEGA.
-
-This project is not affiliated with, endorsed by, sponsored by, or officially connected to ATLUS, P-Studio, or SEGA. No ownership is claimed over Persona-related material.
-
-Attribution does not grant a license to redistribute third-party artwork. Contributors and users are responsible for ensuring they have permission to use any visual assets they add or distribute.
-
-License
-
-The original source code of this project is licensed under the MIT License.
-
-Persona-related artwork, character images, trademarks, and other third-party visual assets are not covered by the MIT License. All rights to those materials remain with their respective copyright holders.
-
-<div align="center">
-
-Made for developers who want their coding activity to feel a little more like building a Confidant.
-
-</div>
+Persona-related artwork, character images, trademarks, and other third-party materials remain the property of their respective rights holders.
