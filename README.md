@@ -2,7 +2,7 @@
 
 <img src="images/icon.png" alt="Dly's Extension RPC" width="132">
 
-# Dly's Extension RPC
+# Dly's Persona Discord RPC Extension
 
 **Confidant-themed Discord Rich Presence for Visual Studio Code**
 
@@ -21,9 +21,9 @@ Display your active project, file, language, and session time on Discord with a 
 
 ## Overview
 
-Dly's Extension RPC connects Visual Studio Code to Discord Desktop through local Rich Presence. It keeps the activity current as you move between files and workspaces, while allowing the displayed text and project visual to be configured.
+This Discord RPC Extension connects Visual Studio Code to Discord Desktop through local Rich Presence. It keeps the activity current as you move between files and workspaces, while allowing the displayed text and project visual to be configured.
 
-Every workspace is mapped to one of 23 Confidant-themed assets. The mapping is deterministic rather than random, so reopening the same project produces the same visual.
+Every workspace is mapped to one of 23 Confidant-themed of Persona 5 Royal Social Links. The mapping is deterministic rather than random, so reopening the same project produces the same visual.
 
 | Capability | Behavior |
 | --- | --- |
@@ -45,7 +45,7 @@ Every workspace is mapped to one of 23 Confidant-themed assets. The mapping is d
 
 ### Project visuals
 
-- 23 Rich Presence assets
+- 23 Rich Presence Confidant assets
 - Stable project-to-image mapping
 - Git remote-based project identification
 - Workspace URI fallback for local projects
