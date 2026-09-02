@@ -2,7 +2,7 @@
 
 <img src="images/icon.png" alt="Dly's Extension RPC" width="132">
 
-# Dly's Persona Discord RPC Extension
+# Dly's Persona 5 Discord RPC Extension
 
 **Confidant-themed Discord Rich Presence for Visual Studio Code**
 
