@@ -4,14 +4,41 @@ import { basename } from 'node:path';
 import { Client } from '@xhayper/discord-rpc';
 
 const APPLICATION_ID = '816277186272034827';
-const ICON_COUNT = 8;
+const ICON_COUNT = 23;
 const SESSION_STARTED_AT = new Date();
+
+type ActivityTypeSetting =
+	| 'playing'
+	| 'listening'
+	| 'watching'
+	| 'competing';
+
+const ACTIVITY_TYPES = {
+	playing: 0,
+	listening: 2,
+	watching: 3,
+	competing: 5
+} as const;
 
 type TemplateValues = {
 	project: string;
 	file: string;
 	language: string;
 	icon: string;
+};
+
+type RpcStatus =
+	| 'connecting'
+	| 'connected'
+	| 'reconnecting'
+	| 'disabled';
+
+type CommandQuickPickItem = vscode.QuickPickItem & {
+	command: string;
+};
+
+type IconQuickPickItem = vscode.QuickPickItem & {
+	value: number;
 };
 
 let rpcClient: Client | undefined;
@@ -21,14 +48,58 @@ let updateTimer: ReturnType<typeof setTimeout> | undefined;
 let forceScheduledUpdate = false;
 let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
 let reconnectAttempt = 0;
+let statusBarItem: vscode.StatusBarItem | undefined;
 let connecting = false;
 let extensionDisposed = false;
 
 export function activate(context: vscode.ExtensionContext) {
 	extensionDisposed = false;
-	void connectToDiscord();
+
+	const statusItem = vscode.window.createStatusBarItem(
+		vscode.StatusBarAlignment.Left,
+		100
+	);
+
+	statusItem.name = 'Extension RPC';
+	statusItem.command = 'extensionRpc.openControlMenu';
+	statusItem.tooltip = 'Open Extension RPC controls';
+	statusItem.show();
+
+	statusBarItem = statusItem;
+	setStatusBar('connecting');
 
 	context.subscriptions.push(
+		statusItem,
+
+		vscode.commands.registerCommand(
+			'extensionRpc.openControlMenu',
+			openControlMenu
+		),
+
+		vscode.commands.registerCommand(
+			'extensionRpc.toggle',
+			togglePresence
+		),
+
+		vscode.commands.registerCommand(
+			'extensionRpc.selectIcon',
+			selectProjectIconOverride
+		),
+
+		vscode.commands.registerCommand(
+			'extensionRpc.reconnect',
+			reconnectToDiscord
+		),
+
+		vscode.commands.registerCommand(
+			'extensionRpc.openSettings',
+			() =>
+				vscode.commands.executeCommand(
+					'workbench.action.openSettings',
+					'Extension RPC'
+				)
+		),
+
 		vscode.window.onDidChangeActiveTextEditor(() => {
 			scheduleActivityUpdate();
 		}),
@@ -47,6 +118,183 @@ export function activate(context: vscode.ExtensionContext) {
 			dispose: stopExtension
 		}
 	);
+
+	void connectToDiscord();
+}
+
+function setStatusBar(
+	status: RpcStatus,
+	detail?: string
+): void {
+	if (!statusBarItem) {
+		return;
+	}
+
+	switch (status) {
+		case 'connecting':
+			statusBarItem.text = '$(sync~spin) RPC: Connecting';
+			statusBarItem.tooltip = 'Connecting to Discord';
+			break;
+
+		case 'connected':
+			statusBarItem.text =
+				`$(broadcast) RPC: ${detail ?? 'Connected'}`;
+			statusBarItem.tooltip =
+				`Connected to Discord using ${detail ?? 'automatic icon'}`;
+			break;
+
+		case 'reconnecting':
+			statusBarItem.text =
+				`$(debug-disconnect) RPC: Retry ${detail ?? ''}`;
+			statusBarItem.tooltip =
+				`Discord disconnected. Retrying in ${detail ?? 'a moment'}`;
+			break;
+
+		case 'disabled':
+			statusBarItem.text = '$(circle-slash) RPC: Off';
+			statusBarItem.tooltip = 'Discord Rich Presence is disabled';
+			break;
+	}
+}
+
+async function openControlMenu(): Promise<void> {
+	const selected =
+		await vscode.window.showQuickPick<CommandQuickPickItem>(
+			[
+				{
+					label: '$(power) Toggle Rich Presence',
+					description: 'Enable or disable presence',
+					command: 'extensionRpc.toggle'
+				},
+				{
+					label: '$(symbol-color) Select Project Icon',
+					description: 'Automatic or rpc_1 through rpc_8',
+					command: 'extensionRpc.selectIcon'
+				},
+				{
+					label: '$(refresh) Reconnect to Discord',
+					description: 'Restart the local RPC connection',
+					command: 'extensionRpc.reconnect'
+				},
+				{
+					label: '$(gear) Open Settings',
+					description: 'Customize text and behavior',
+					command: 'extensionRpc.openSettings'
+				}
+			],
+			{
+				placeHolder: 'Extension RPC controls'
+			}
+		);
+
+	if (selected) {
+		await vscode.commands.executeCommand(selected.command);
+	}
+}
+
+function getEditableSettings(): {
+	settings: vscode.WorkspaceConfiguration;
+	target: vscode.ConfigurationTarget;
+} {
+	const folder = getActiveWorkspaceFolder();
+	const hasWorkspace =
+		(vscode.workspace.workspaceFolders?.length ?? 0) > 0;
+
+	return {
+		settings: vscode.workspace.getConfiguration(
+			'extensionRpc',
+			folder?.uri
+		),
+		target: hasWorkspace
+			? vscode.ConfigurationTarget.Workspace
+			: vscode.ConfigurationTarget.Global
+	};
+}
+
+async function togglePresence(): Promise<void> {
+	const { settings, target } = getEditableSettings();
+	const enabled = settings.get<boolean>('enabled', true);
+
+	await settings.update('enabled', !enabled, target);
+
+	vscode.window.setStatusBarMessage(
+		`Extension RPC ${enabled ? 'disabled' : 'enabled'}.`,
+		2500
+	);
+}
+
+async function selectProjectIconOverride(): Promise<void> {
+	const { settings, target } = getEditableSettings();
+	const currentIcon = settings.get<number>('iconOverride', 0);
+
+	const items: IconQuickPickItem[] = [
+		{
+			label: '$(sync) Automatic',
+			description:
+				currentIcon === 0
+					? 'Current • stable project mapping'
+					: 'Stable project mapping',
+			value: 0
+		}
+	];
+
+	for (let icon = 1; icon <= ICON_COUNT; icon++) {
+		items.push({
+			label: `$(file-media) rpc_${icon}`,
+			description:
+				currentIcon === icon ? 'Current' : undefined,
+			value: icon
+		});
+	}
+
+	const selected =
+		await vscode.window.showQuickPick<IconQuickPickItem>(
+			items,
+			{
+				placeHolder: 'Select an icon for this workspace'
+			}
+		);
+
+	if (!selected || selected.value === currentIcon) {
+		return;
+	}
+
+	await settings.update(
+		'iconOverride',
+		selected.value,
+		target
+	);
+
+	scheduleActivityUpdate(true);
+}
+
+async function reconnectToDiscord(): Promise<void> {
+	if (extensionDisposed) {
+		return;
+	}
+
+	if (reconnectTimer) {
+		clearTimeout(reconnectTimer);
+		reconnectTimer = undefined;
+	}
+
+	reconnectAttempt = 0;
+	connecting = false;
+	rpcReady = false;
+	currentActivitySignature = undefined;
+
+	const client = rpcClient;
+	rpcClient = undefined;
+
+	setStatusBar('connecting');
+
+	if (client) {
+		await shutdownRpcClient(client);
+	}
+
+	if (!extensionDisposed) {
+		await connectToDiscord();
+	}
 }
 
 async function connectToDiscord(): Promise<void> {
@@ -58,6 +306,7 @@ async function connectToDiscord(): Promise<void> {
 		return;
 	}
 
+	setStatusBar('connecting');
 	connecting = true;
 
 	const client = new Client({
@@ -130,6 +379,8 @@ function scheduleReconnect(): void {
 		30000
 	);
 
+	setStatusBar('reconnecting', `${delay / 1000}s`);
+
 	console.log(
 		`[Extension RPC] Reconnecting in ${delay / 1000}s.`
 	);
@@ -188,6 +439,8 @@ function stopExtension(): void {
 	if (client) {
 		void shutdownRpcClient(client);
 	}
+
+	statusBarItem?.hide();
 }
 
 function scheduleActivityUpdate(force = false): void {
@@ -222,6 +475,8 @@ async function updateActivity(force = false): Promise<void> {
 	const user = rpcClient.user;
 
 	if (!enabled) {
+		setStatusBar('disabled');
+
 		if (currentActivitySignature !== 'disabled') {
 			await user.clearActivity();
 			currentActivitySignature = 'disabled';
@@ -316,6 +571,9 @@ async function updateActivity(force = false): Promise<void> {
 		console.log(
 			`[Extension RPC] ${projectName} → ${iconKey}`
 		);
+
+		setStatusBar('connected', iconKey);
+
 	} catch (error) {
 		console.error(
 			'[Extension RPC] Failed to update activity:',

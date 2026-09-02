@@ -1,8 +1,9 @@
 {
   "name": "extension-rpc",
   "displayName": "Dly's Extension RPC",
+  "icon": "images/icon.png",
   "description": "Custom Personal Discord Rich Presence for Visual Studio Code",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "engines": {
     "vscode": "^1.134.0"
   },
@@ -14,6 +15,33 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "extensionRpc.openControlMenu",
+        "title": "Open Control Menu",
+        "category": "Extension RPC"
+      },
+      {
+        "command": "extensionRpc.toggle",
+        "title": "Toggle Rich Presence",
+        "category": "Extension RPC"
+      },
+      {
+        "command": "extensionRpc.selectIcon",
+        "title": "Select Project Icon",
+        "category": "Extension RPC"
+      },
+      {
+        "command": "extensionRpc.reconnect",
+        "title": "Reconnect to Discord",
+        "category": "Extension RPC"
+      },
+      {
+        "command": "extensionRpc.openSettings",
+        "title": "Open Settings",
+        "category": "Extension RPC"
+      }
+    ],
     "configuration": {
       "title": "Extension RPC",
       "properties": {
@@ -46,8 +74,25 @@
           "type": "integer",
           "default": 0,
           "minimum": 0,
-          "maximum": 8,
-          "description": "Force an icon from 1 to 8. Use 0 for automatic project-based selection."
+          "maximum": 23,
+          "description": "Force an icon from 1 to 23. Use 0 for automatic project-based selection."
+        },
+        "extensionRpc.activityType": {
+          "type": "string",
+          "default": "playing",
+          "enum": [
+            "playing",
+            "listening",
+            "watching",
+            "competing"
+          ],
+          "enumDescriptions": [
+            "Display Playing on Discord.",
+            "Display Listening on Discord.",
+            "Display Watching on Discord.",
+            "Display Competing on Discord."
+          ],
+          "description": "Select the activity type displayed on Discord."
         }
       }
     }
