@@ -1,113 +1,143 @@
 <div align="center">
 
-<img src="images/icon.png" alt="Dly's Extension RPC icon" width="128" height="128">
+<img src="images/icon.png" alt="Dly's Extension RPC" width="132">
 
 # Dly's Extension RPC
 
-A Confidant-themed Discord Rich Presence extension for Visual Studio Code.
+**Confidant-themed Discord Rich Presence for Visual Studio Code**
+
+Display your active project, file, language, and session time on Discord with a stable project-specific visual.
+
+<br>
+
+<img alt="Visual Studio Code 1.134 or newer" src="https://img.shields.io/badge/VS_Code-1.134%2B-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white">
+<img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-6.0-3178C6?style=flat-square&logo=typescript&logoColor=white">
+<img alt="Discord Rich Presence" src="https://img.shields.io/badge/Discord-Rich_Presence-5865F2?style=flat-square&logo=discord&logoColor=white">
+<img alt="Version 0.2.0" src="https://img.shields.io/badge/version-0.2.0-222222?style=flat-square">
 
 </div>
 
 ---
 
-## About
+## Overview
 
-Dly's Extension RPC publishes your current Visual Studio Code activity to Discord. The presence can display the active project, file, programming language, elapsed session time, and a project-specific image.
+Dly's Extension RPC connects Visual Studio Code to Discord Desktop through local Rich Presence. It keeps the activity current as you move between files and workspaces, while allowing the displayed text and project visual to be configured.
 
-Projects are assigned one of 23 Rich Presence images through deterministic mapping. The extension uses the project's Git remote as its identity when available and falls back to the workspace URI for local projects. This ensures that the same project retains the same image between sessions.
+Every workspace is mapped to one of 23 Confidant-themed assets. The mapping is deterministic rather than random, so reopening the same project produces the same visual.
 
+| Capability | Behavior |
+| --- | --- |
+| Project identity | Uses the normalized Git remote when available |
+| Local fallback | Uses the normalized workspace URI |
+| Project visuals | Maps each identity to `rpc_1` through `rpc_23` |
+| Editor context | Tracks the active project, file, and language |
+| Session context | Optionally displays elapsed session time |
+| Connection | Reconnects automatically when Discord becomes available |
 
-Show what you are working on through a customizable Discord activity, complete with project-aware Confidant-inspired artwork.
-</div>
+## Features
 
+### Presence
 
-About
+- Active workspace, file, and language detection
+- Customizable primary text, secondary text, and image tooltip
+- Optional elapsed session timer
+- Live updates when the active editor or workspace changes
+
+### Project visuals
+
+- 23 Rich Presence assets
+- Stable project-to-image mapping
+- Git remote-based project identification
+- Workspace URI fallback for local projects
+- Per-workspace manual image override
+
+### Reliability and controls
+
+- Automatic reconnection with exponential backoff
+- Multi-root workspace support
+- Status bar connection indicator
+- Quick-access control menu
+
+## Requirements
+
 - Visual Studio Code `1.134.0` or newer
 - Discord Desktop running on the same computer
 - **Display current activity as a status message** enabled in Discord's Activity Privacy settings
 
+> [!IMPORTANT]
+> Discord's web client cannot receive local Rich Presence connections.
 
-Discord's web client cannot receive local Rich Presence connections.
-Installation
+## Installation
 
-Install from a VSIX package
+### Install from VSIX
 
+1. Download or build the `.vsix` package.
+2. Open Visual Studio Code.
+3. Open the Command Palette with `Ctrl+Shift+P` (`Cmd+Shift+P` on macOS).
+4. Run **Extensions: Install from VSIX...**.
+5. Select the downloaded package.
+6. Reload Visual Studio Code when prompted.
 
-Download the latest .vsix file from the repository releases.
-The text settings support the following variables:
+The package can also be installed from a terminal:
 
-| Variable | Description |
+```sh
+code --install-extension extension-rpc-0.2.0.vsix
+```
+
+### Run from source
+
+```sh
+git clone https://github.com/RakhaNoor01/extension-discord-rpc.git
+cd extension-discord-rpc
+npm install
+npm run compile
+```
+
+Open the project in Visual Studio Code and press `F5` to launch an Extension Development Host.
+
+## Usage
+
+Start Discord Desktop, open a folder or workspace in Visual Studio Code, and allow the extension to connect. The status bar displays the current RPC connection state and opens the control menu when selected.
+
+Use the control menu to toggle Rich Presence, select a project image, reconnect to Discord, or open the extension settings.
+
+## Commands
+
+Open the Command Palette and search for **Extension RPC**.
+
+| Command | Description |
 | --- | --- |
-| `{project}` | Name of the active workspace folder |
-| `{file}` | Name of the active file |
+| `Extension RPC: Open Control Menu` | Opens the Rich Presence control menu. |
+| `Extension RPC: Toggle Rich Presence` | Enables or disables Rich Presence. |
+| `Extension RPC: Select Project Icon` | Selects automatic mapping or a specific project image. |
+| `Extension RPC: Reconnect to Discord` | Restarts the local RPC connection. |
+| `Extension RPC: Open Settings` | Opens the extension settings. |
+
+## Configuration
+
+| Setting | Type | Default | Description |
+| --- | --- | --- | --- |
+| `extensionRpc.enabled` | boolean | `true` | Enables or disables Rich Presence. |
+| `extensionRpc.detailsFormat` | string | `Working on {project}` | Controls the primary activity text. |
+| `extensionRpc.stateFormat` | string | `Editing {file}` | Controls the secondary activity text. |
+| `extensionRpc.largeImageTextFormat` | string | `{project} • {language}` | Controls the image tooltip. |
+| `extensionRpc.showElapsedTime` | boolean | `true` | Shows or hides elapsed session time. |
+| `extensionRpc.iconOverride` | integer | `0` | Selects image `1`–`23`; `0` restores automatic mapping. |
+
+Configuration changes made while a workspace is open are stored for that workspace. This allows projects to use separate image overrides and presence formats.
+
+### Template variables
+
+| Variable | Resolves to |
+| --- | --- |
+| `{project}` | Active workspace folder name |
+| `{file}` | Active file name |
 | `{language}` | Visual Studio Code language identifier |
 | `{icon}` | Selected Discord asset key |
 
+Example:
 
-Run Extensions: Install from VSIX....
-
-Select the downloaded .vsix file.
-
-Reload Visual Studio Code when prompted.
-
-You can also install it from a terminal:
-
-code --install-extension extension-rpc-0.2.0.vsix
-
-Run from source
-
-git clone YOUR_REPOSITORY_URL
-cd extension-rpc
-npm install
-npm run compile
-
-Open the project in Visual Studio Code and press F5 to start an Extension Development Host.
-
-Commands
-
-Open the Command Palette with Ctrl+Shift+P and search for Extension RPC.
-
-Command
-
-Description
-
-Extension RPC: Open Control Menu
-
-Opens the main Rich Presence controls.
-
-Extension RPC: Toggle Rich Presence
-
-Enables or disables the presence.
-
-Extension RPC: Select Project Icon
-
-Uses automatic mapping or selects an image manually.
-
-Extension RPC: Reconnect to Discord
-
-Restarts the local Discord RPC connection.
-
-Extension RPC: Open Settings
-
-Opens all extension settings.
-
-Settings
-
-Setting
-
-Default
-
-Description
-
-extensionRpc.enabled
-
-true
-
-Enables or disables Discord Rich Presence.
-
-extensionRpc.detailsFormat
 ```json
-
 {
   "extensionRpc.detailsFormat": "Working on {project}",
   "extensionRpc.stateFormat": "Editing {file} • {language}",
@@ -115,24 +145,24 @@ extensionRpc.detailsFormat
 }
 ```
 
-Resolved fields are trimmed and limited to 128 characters. Fields shorter than two characters are omitted from the presence.
+Resolved fields are trimmed and limited to 128 characters. A field shorter than two characters is omitted from the activity.
 
 ## Project Image Assignment
 
-Automatic image selection follows these steps:
+Automatic image assignment follows a consistent four-stage process:
 
-1. The extension determines the active workspace folder.
-2. The normalized Git remote URL is used as the project identity when available.
-3. The normalized workspace URI is used when no Git remote is configured.
-4. The identity is hashed and mapped to an asset from `rpc_1` through `rpc_23`.
+1. Determine the active workspace folder.
+2. Read and normalize its Git `remote.origin.url`, when available.
+3. Fall back to the normalized workspace URI when no remote exists.
+4. Hash the resulting identity and map it to `rpc_1` through `rpc_23`.
 
-The mapping remains stable while the project identity and number of available assets remain unchanged.
+The assignment remains stable while the project identity and number of available assets remain unchanged.
 
-To select an image manually, run **Extension RPC: Select Project Icon** and choose an asset. Select **Automatic** to restore project-based mapping.
+To pin a different image to a workspace, run **Extension RPC: Select Project Icon** and select an asset. Choose **Automatic** to return to deterministic mapping.
 
 ## Building
 
-Install dependencies, compile the extension, and create a VSIX package:
+Install dependencies, compile the TypeScript source, and create a VSIX package:
 
 ```sh
 npm install
@@ -140,28 +170,37 @@ npm run compile
 npx vsce package
 ```
 
-The generated `.vsix` file can be installed manually or attached to a repository release.
+The generated `.vsix` can be installed locally or attached to a GitHub release.
 
 ## Troubleshooting
 
-### Rich Presence is not visible
+<details>
+<summary><strong>Rich Presence is not visible</strong></summary>
 
-- Confirm that Discord Desktop is running.
-- Confirm that activity sharing is enabled in Discord.
-- Run **Extension RPC: Reconnect to Discord**.
-- Reload Visual Studio Code and restart Discord if necessary.
+1. Confirm that Discord Desktop is running.
+2. Confirm that activity sharing is enabled in Discord.
+3. Run **Extension RPC: Reconnect to Discord**.
+4. Reload Visual Studio Code and restart Discord if necessary.
 
-### Discord displays an outdated image
+</details>
 
-Discord may cache Rich Presence assets. Restart Discord after replacing an asset in the Developer Portal. Keep the asset keys named `rpc_1` through `rpc_23`.
+<details>
+<summary><strong>Discord displays an outdated image</strong></summary>
 
-### The RPC connection is unavailable
+Discord may cache Rich Presence assets. Restart Discord after replacing an asset in the Developer Portal, and keep its key unchanged.
 
-The extension retries the connection automatically with a delay of up to 30 seconds. You can also reconnect manually from the control menu.
+</details>
+
+<details>
+<summary><strong>The RPC connection is unavailable</strong></summary>
+
+The extension retries automatically with a delay of up to 30 seconds. A manual reconnect is also available from the control menu.
+
+</details>
 
 ## Privacy
 
-The extension uses Discord's local RPC connection to publish workspace information to the Discord Desktop client. It reads the active workspace name, file name, language identifier, and Git remote when constructing the activity.
+The extension uses Discord's local RPC connection to publish workspace information to Discord Desktop. It reads the active workspace name, file name, language identifier, and Git remote when constructing the activity.
 
 ## Credits and Disclaimer
 
