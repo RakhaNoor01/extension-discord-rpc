@@ -10,17 +10,10 @@ Display your active project, file, language, and session time on Discord with a 
 
 <br>
 
-<img alt="Visual Studio Code 1.134 or newer"
-     src="https://img.shields.io/badge/VS_CODE-1.134%2B-000000?style=for-the-badge&logo=visualstudiocode&logoColor=white&labelColor=000000">
-
-<img alt="TypeScript 6.0"
-     src="https://img.shields.io/badge/TYPESCRIPT-6.0-000000?style=for-the-badge&logo=typescript&logoColor=white&labelColor=000000">
-
-<img alt="Discord Rich Presence"
-     src="https://img.shields.io/badge/DISCORD-RICH_PRESENCE-000000?style=for-the-badge&logo=discord&logoColor=white&labelColor=000000">
-
-<img alt="Version 0.2.0"
-     src="https://img.shields.io/badge/VERSION-0.2.0-000000?style=for-the-badge&logo=git&logoColor=white&labelColor=000000">
+<img alt="Visual Studio Code 1.134 or newer" src="https://img.shields.io/badge/VS_CODE-1.134%2B-000000?style=for-the-badge&logo=visualstudiocode&logoColor=white&labelColor=000000">
+<img alt="TypeScript 6.0" src="https://img.shields.io/badge/TYPESCRIPT-6.0-000000?style=for-the-badge&logo=typescript&logoColor=white&labelColor=000000">
+<img alt="Discord Rich Presence" src="https://img.shields.io/badge/DISCORD-RICH_PRESENCE-000000?style=for-the-badge&logo=discord&logoColor=white&labelColor=000000">
+<img alt="Version 0.2.0" src="https://img.shields.io/badge/VERSION-0.2.0-000000?style=for-the-badge&logo=git&logoColor=white&labelColor=000000">
 
 </div>
 
