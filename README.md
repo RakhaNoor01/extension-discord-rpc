@@ -34,19 +34,6 @@ Every workspace is mapped to one of 23 Confidant-themed of Persona 5 Royal Socia
 | Session context | Optionally displays elapsed session time |
 | Connection | Reconnects automatically when Discord becomes available |
 
-## Preview
-
-<div align="center">
-  <a href="images/preview.png">
-    <img
-      src="images/preview.png?raw=true&v=2"
-      alt="Dly's Extension RPC displaying a coding activity on Discord"
-      width="429"
-      height="211"
-    >
-  </a>
-</div>
-
 ## Features
 
 ### Presence
