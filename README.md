@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="images/icon.png" alt="Dly's Extension RPC icon" width="128">
-
 Dly's Extension RPC
 
 A Confidant-themed Discord Rich Presence for Visual Studio Code
